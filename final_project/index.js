@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const session = require('express-session')
+
 const customer_routes = require('./router/auth_users.js').authenticated;
 const genl_routes = require('./router/general.js').general;
 
@@ -11,7 +12,22 @@ app.use(express.json());
 app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
 
 app.use("/customer/auth/*", function auth(req,res,next){
-//Write the authenication mechanism here
+    const token = req.header("Authorization");
+    if (!token) {
+        return res.status(401).json({message: "Unauthorized - Missing Token"});
+
+    }
+
+    try {
+        // const decoded = jwt.verify(token, "your-secret-key");
+        // req.user = decoded.user;
+        next();
+
+    } catch (err) { 
+        res.status(401).json({message: "Unauthorized - Invalid - Token"});
+        
+    }
+
 });
  
 const PORT =5000;
